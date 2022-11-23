@@ -126,19 +126,13 @@ class Gun:
             self.color = GREY
 
     def draw(self):
-        # FIXIT don't know how to do it
+        '''Риование пушки'''
         len = 30 + self.f2_power
-        '''pygame.draw.polygon(self.screen,
-                            self.color,
-                            True,
-                            [[40, 450],
-                            [x1, y1],
-                            [x1 - 5 * math.sin(self.an), y1 + 5 * math.cos(self.an)],
-                            [40 - 5 * math.sin(self.an), 450 + 5 * math.cos(self.an)]])'''
         pygame.draw.line(self.screen, self.color,
                         [40, 475], [40 + (len * math.cos(self.an)), 475 + (len * math.sin(self.an))], 10)
 
     def power_up(self):
+        '''Увеличение силы выстрела пушки'''
         if self.f2_on:
             if self.f2_power < 100:
                 self.f2_power += 1
@@ -171,6 +165,7 @@ class Target:
             self.v_x = 5
         self.r = randint(15, 50)
         self.live = 1
+        self.points = 0
 
     def hit(self, points=1):
         """Попадание шарика в цель."""
@@ -189,6 +184,7 @@ class Target:
         self.y += self.v_y
 
     def draw(self):
+        '''Рисование цели'''
         pygame.draw.circle(
             self.screen,
             BLACK,
@@ -215,6 +211,7 @@ class CTarget(Target):
         self.y = self.Y + (self.R * math.sin(self.angle))
 
     def new_target(self):
+        '''Инициализация параметров новой вращающейся цели'''
         self.r = randint(10, 40)
         self.R = randint(40, 100)
         self.angle = random() * 2 * math.pi
@@ -226,6 +223,7 @@ class CTarget(Target):
         self.w = random() / 50
 
     def move(self):
+        '''Движение цели по окружности'''
         self.angle += self.w * 2 * math.pi
         self.x = self.X + (self.R * math.cos(self.angle))
         self.y = self.Y + (self.R * math.sin(self.angle))
