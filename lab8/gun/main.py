@@ -23,6 +23,9 @@ HEIGHT = 600
 
 GRAV = 2
 
+targets_number = 2
+balls_number = 10
+
 
 class Ball:
     def __init__(self, screen: pygame.Surface, x=40, y=450):
@@ -41,28 +44,26 @@ class Ball:
         self.color = choice(GAME_COLORS)
         self.live = 30
 
-    def move(self):
+    def move(self, ball):
         """Переместить мяч по прошествии единицы времени.
 
         Метод описывает перемещение мяча за один кадр перерисовки. То есть, обновляет значения
         self.x и self.y с учетом скоростей self.vx и self.vy, силы гравитации, действующей на мяч,
         и стен по краям окна (размер окна 800х600).
         """
+        global balls
         self.vy -= GRAV
         if((self.x + self.r > WIDTH) or (self.x - self.r < 0)):
             self.vx = -self.vx
-        elif(self.y + self.r < 0):
+        if(self.y + self.r < 0):
             self.vy = -self.vy
-        elif(self.y - self.r > 450):
+        if(self.y - self.r > 450):
             self.y = 450 + self.r + 1
             self.vy = - self.vy * 0.3
             self.vx = self.vx * 0.3
             self.live -= 1
             if(self.live == 0):
-                self.color = WHITE
-
-
-
+                balls.remove(ball)
         self.x += self.vx
         self.y -= self.vy
 
@@ -157,29 +158,52 @@ class Target:
         self.screen = screen
         self.x = x
         self.y = y
+        self.v_x = 0
+        self.v_y = 0
         self.r = r
         self.color = RED
         self.new_target()
 
     def new_target(self):
         """ Инициализация новой цели. """
-        self.x = randint(600, 780)
-        self.y = randint(300, 450)
-        self.r = randint(5, 50)
+        self.x = randint(600, 730)
+        self.y = randint(300, 400)
+        self.v_x = randint(-7, 7)
+        self.v_y = randint(-7, 7)
+        if(self.v_x == 0):
+            self.v_x = 5
+        self.r = randint(15, 50)
         self.live = 1
 
     def hit(self, points=1):
         """Попадание шарика в цель."""
         self.points += points
 
+    def move(self):
+        '''Движение цели'''
+        if ((self.x + self.r > WIDTH) or (self.x - self.r < 0)):
+            self.v_x = -self.v_x
+        if (self.y + self.r < 0):
+            self.v_y = -self.v_y
+        if (self.y - self.r > 450):
+            self.y = 450 + self.r + 1
+            self.v_y = -self.v_y
+        self.x += self.v_x
+        self.y += self.v_y
+
     def draw(self):
+        pygame.draw.circle(
+            self.screen,
+            BLACK,
+            (self.x, self.y),
+            self.r + 2
+        )
         pygame.draw.circle(
             self.screen,
             self.color,
             (self.x, self.y),
             self.r
         )
-
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -188,14 +212,20 @@ balls = []
 
 clock = pygame.time.Clock()
 gun = Gun(screen)
-target = Target(screen)
+
+targets = []
+for i in range(targets_number):
+    targets.append(Target(screen))
 
 finished = False
+
+
 
 while not finished:
     screen.fill(WHITE)
     gun.draw()
-    target.draw()
+    for target in targets:
+        target.draw()
     for b in balls:
         b.draw()
     pygame.display.update()
@@ -212,12 +242,15 @@ while not finished:
             gun.targetting(event)
 
     for b in balls:
-        b.move()
-
-        if b.hittest(target) and target.live:
-            target.live = 0
-            target.hit()
-            target.new_target()
+        b.move(b)
+        for target in targets:
+            if b.hittest(target) and target.live:
+                target.live = 0
+                target.hit()
+                target.new_target()
     gun.power_up()
+
+    for target in targets:
+        target.move()
 
 pygame.quit()
