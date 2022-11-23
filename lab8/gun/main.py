@@ -31,7 +31,6 @@ balls_number = 10
 class Ball:
     def __init__(self, screen: pygame.Surface, x=40, y=450):
         """ Конструктор класса ball
-
         Args:
         x - начальное положение мяча по горизонтали
         y - начальное положение мяча по вертикали
@@ -47,7 +46,6 @@ class Ball:
 
     def move(self, ball):
         """Переместить мяч по прошествии единицы времени.
-
         Метод описывает перемещение мяча за один кадр перерисовки. То есть, обновляет значения
         self.x и self.y с учетом скоростей self.vx и self.vy, силы гравитации, действующей на мяч,
         и стен по краям окна (размер окна 800х600).
@@ -79,7 +77,6 @@ class Ball:
 
     def hittest(self, obj):
         """Функция проверяет сталкивалкивается ли данный обьект с целью, описываемой в обьекте obj.
-
         Args:
             obj: Обьект, с которым проверяется столкновение.
         Returns:
@@ -105,7 +102,6 @@ class Gun:
 
     def fire2_end(self, event):
         """Выстрел мячом.
-
         Происходит при отпускании кнопки мыши.
         Начальные значения компонент скорости мяча vx и vy зависят от положения мыши.
         """
@@ -140,7 +136,7 @@ class Gun:
                             [x1 - 5 * math.sin(self.an), y1 + 5 * math.cos(self.an)],
                             [40 - 5 * math.sin(self.an), 450 + 5 * math.cos(self.an)]])'''
         pygame.draw.line(self.screen, self.color,
-                        [40, 450], [40 + (len * math.cos(self.an)), 450 + (len * math.sin(self.an))], 10)
+                        [40, 475], [40 + (len * math.cos(self.an)), 475 + (len * math.sin(self.an))], 10)
 
     def power_up(self):
         if self.f2_on:
@@ -184,10 +180,10 @@ class Target:
         '''Движение цели'''
         if ((self.x + self.r > WIDTH) or (self.x - self.r < 0)):
             self.v_x = -self.v_x
-        if (self.y + self.r < 0):
+        if (self.y - self.r < 0):
             self.v_y = -self.v_y
-        if (self.y - self.r > 450):
-            self.y = 450 + self.r + 1
+        if (self.y + self.r > 475):
+            self.y = 475 - self.r - 1
             self.v_y = -self.v_y
         self.x += self.v_x
         self.y += self.v_y
@@ -256,6 +252,7 @@ while not finished:
     screen.fill(WHITE)
     gun.draw()
     ctarget.draw()
+    pygame.draw.line(screen, BLACK, [0, 480], [800, 480], 2)
     for target in targets:
         target.draw()
     for b in balls:
