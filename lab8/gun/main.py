@@ -1,5 +1,6 @@
 import math
 from random import randint
+from random import random
 from random import choice
 
 import pygame
@@ -205,6 +206,35 @@ class Target:
             self.r
         )
 
+
+class CTarget(Target):
+    def __init__(self, screen):
+        super().__init__(screen)
+        self.R = 40
+        self.angle = math.pi
+        self.color = CYAN
+        self.X = self.x
+        self.x = self.X + (self.R * math.cos(self.angle))
+        self.Y = self.y
+        self.y = self.Y + (self.R * math.sin(self.angle))
+
+    def new_target(self):
+        self.r = randint(10, 40)
+        self.R = randint(40, 100)
+        self.angle = random() * 2 * math.pi
+        self.X = randint(100, 600)
+        self.x = self.X + (self.R * math.cos(self.angle))
+        self.Y = randint(100, 400)
+        self.y = self.Y + (self.R * math.sin(self.angle))
+        self.live = 1
+        self.w = random() / 50
+
+    def move(self):
+        self.angle += self.w * 2 * math.pi
+        self.x = self.X + (self.R * math.cos(self.angle))
+        self.y = self.Y + (self.R * math.sin(self.angle))
+
+
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 bullet = 0
@@ -219,11 +249,13 @@ for i in range(targets_number):
 
 finished = False
 
-
+ctarget = CTarget(screen)
+ctarget.draw()
 
 while not finished:
     screen.fill(WHITE)
     gun.draw()
+    ctarget.draw()
     for target in targets:
         target.draw()
     for b in balls:
@@ -248,9 +280,13 @@ while not finished:
                 target.live = 0
                 target.hit()
                 target.new_target()
+        if b.hittest(ctarget) and ctarget.live:
+            ctarget.live = 0
+            ctarget.hit()
+            ctarget.new_target()
     gun.power_up()
 
     for target in targets:
         target.move()
-
+    ctarget.move()
 pygame.quit()
