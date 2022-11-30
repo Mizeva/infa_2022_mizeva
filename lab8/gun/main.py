@@ -240,16 +240,15 @@ gun = Gun(screen)
 targets = []
 for i in range(targets_number):
     targets.append(Target(screen))
+targets.append(CTarget(screen))
 
 finished = False
 
-ctarget = CTarget(screen)
-ctarget.draw()
+
 
 while not finished:
     screen.fill(WHITE)
     gun.draw()
-    ctarget.draw()
     pygame.draw.line(screen, BLACK, [0, 480], [800, 480], 2)
     for target in targets:
         target.draw()
@@ -275,13 +274,9 @@ while not finished:
                 target.live = 0
                 target.hit()
                 target.new_target()
-        if b.hittest(ctarget) and ctarget.live:
-            ctarget.live = 0
-            ctarget.hit()
-            ctarget.new_target()
     gun.power_up()
 
     for target in targets:
         target.move()
-    ctarget.move()
+
 pygame.quit()
